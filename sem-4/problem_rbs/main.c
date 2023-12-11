@@ -95,7 +95,6 @@ void make_bucket(int *inp, int count) {
   struct bucket_t *buckets;
   int add_left;
 
-  printf("Bucket size: %d\n", bucket_size);
   
   if (bucket_size < 1) {
     fprintf(stderr, "Bucket less then 1\n");
@@ -103,25 +102,20 @@ void make_bucket(int *inp, int count) {
   }
 
   buckets = (struct bucket_t *)calloc(count, sizeof(struct bucket_t));
-#if 0
+
+  // Edit for contest 
   for (int i = 0; i < count; i++) {
-    add_left = (i == 0) ? 0 : 1;
+    add_left = 0;
     buckets[i].min = i * bucket_size + add_left;
-    buckets[i].max = (i == count - 1) ? max : (i + 1) * bucket_size;
+    buckets[i].max = (i == count - 1) ? max+1 : (i + 1) * bucket_size;
+#if 0
     printf("Bucket %d Min: %d Max: %d\n", i, buckets[i].min, buckets[i].max);
-  }
 #endif
-  
-  for (int i = 0; i < count; i++) {
-    
-    buckets[i].min = i * bucket_size + 1;
-    buckets[i].max = (i + 1) * bucket_size;
-    printf("Bucket %d Min: %d Max: %d\n", i, buckets[i].min, buckets[i].max);
   }
 
   for (int i = 0; i < count; i++) {
     for (int bi = 0; bi < count; bi++) {
-      if (buckets[bi].min <= inp[i] && inp[i] <= buckets[bi].max) {
+      if (buckets[bi].min <= inp[i] && inp[i] < buckets[bi].max) {
         add_to_bucket(&buckets[bi], inp[i]);
         break;
       }
