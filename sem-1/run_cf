@@ -1,2 +1,0 @@
-#!/bin/bash
-for filename in test_cf*; do ./a.out < "$filename"; done
