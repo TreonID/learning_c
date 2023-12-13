@@ -2,6 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+struct res_ee_t {
+  int a, b, c;
+};
+
+struct res_ee_t *calc_ee(int x, int y);
+
 int iabs(int x) { return (x < 0) ? -x : x; }
 
 int eu_mod(int x, int y) {
@@ -32,19 +38,23 @@ int nod(int m, int n) {
 }
 
 void print_de(int a, int b, int c) {
-  int n = nod(a, b), x, y, x1 = 0;
+  struct res_ee_t *ee = calc_ee(a, b);
+  int n = nod(a, b), x, y, d_mult;
   if (eu_mod(c, n) != 0) {
     printf("NONE\n");
     return ;
   }
-  x = b * x1;
-  y = eu_div(c, b) - a * x1;
+  
+  d_mult = ee->c * c / iabs(ee->c);
+  x = ee->a * d_mult;
+  y = ee->b * d_mult;
   printf("%d %d\n", x, y);
   assert(a * x + b * y == c);
 }
 
 
-void print_ee(int x, int y) {
+struct res_ee_t *calc_ee(int x, int y) {
+  struct res_ee_t *result;
   int a, a1, b, b1, r, q, c, d, t;
   a1 = b = 1;
   a = b1 = 0;
@@ -54,9 +64,6 @@ void print_ee(int x, int y) {
   for (; ; ) {
     q = eu_div(c, d);
     r = eu_mod(c, d);
-#if 0
-    printf("%lld\t%lld\t%lld\t%lld\t%lld\t%lld\t%lld\t%lld\t%lld\n", a1, a, b1, b, c, d, q, r, check);
-#endif
     if (r == 0) break;
 
     c = d;
@@ -69,11 +76,17 @@ void print_ee(int x, int y) {
     b = t - (q * b);
 
   }
-  printf("%d %d %d\n", a, b, d);
+  
+  result = calloc(1, sizeof(struct res_ee_t));
+  result->a = a;
+  result->b = b;
+  result->c = d;
+
+#if 0
+  printf("EE: %d %d %d\n", a, b, d);
+#endif
+  return result;
 }
-
-
-
 
 
 int main() {
@@ -84,11 +97,5 @@ int main() {
     fprintf(stderr, "Input error");
     abort();
   }
-
-  printf("%d*x + %d*y = %d\n", a, b, c);
-#if 0
   print_de(a, b, c);
-#endif
-  printf("NOD(%d,%d) = %d\n", a, b, nod(a, b));
-  print_ee(a, b);
 }
