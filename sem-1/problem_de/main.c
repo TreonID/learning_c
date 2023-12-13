@@ -50,6 +50,7 @@ void print_de(int a, int b, int c) {
   y = ee->b * d_mult;
   printf("%d %d\n", x, y);
   assert(a * x + b * y == c);
+  free(ee);
 }
 
 
