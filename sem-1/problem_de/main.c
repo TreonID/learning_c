@@ -45,7 +45,8 @@ void print_de(int a, int b, int c) {
     return ;
   }
   
-  d_mult = ee->c * c / iabs(ee->c);
+//  d_mult = ee->c * c / iabs(ee->c);
+  d_mult = (ee->c < 0) ? -c: c;
   x = ee->a * d_mult;
   y = ee->b * d_mult;
   printf("%d %d\n", x, y);
