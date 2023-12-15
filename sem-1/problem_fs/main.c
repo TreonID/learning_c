@@ -11,10 +11,9 @@ unsigned fact(unsigned x) {
 void fact_system(unsigned x) {
 	unsigned k, i, p, factor;
   int max_factor_i = -1;
-	unsigned result[12] = {0};
 
   if (x == 0) {
-    printf("0\n");
+    printf("0.\n");
     return;
   }
 
@@ -36,15 +35,10 @@ void fact_system(unsigned x) {
     factor = fact(i);
     k = x / factor;
     x = x % factor;
-    result[p] = k;
+    printf("%u.", k);
     p++;
   }
-
-	for(int j = 0; j < p; j++) {
-		printf("%u.", result[j]);
-	}
-	printf("\n");
-
+  printf("\n");
 }
 
 
