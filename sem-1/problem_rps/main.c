@@ -18,16 +18,18 @@ unsigned pow_mod(unsigned n, unsigned k, unsigned m) {
 
 unsigned spow_mod(unsigned a, unsigned b, unsigned n) {
   unsigned mult = a % n;
-  unsigned prod = 1; 
-  printf("B: %u Mult: %u\n", b, mult);
+  unsigned prod = 1;
+  if (b == 1) {
+    return mult;
+  }
+  b++;
   while(b > 0) {
     if ((b % 2) == 1) {
       prod = pow_mod(mult, prod, n);
       b = b - 1;
     }
-    mult = pow_mod(mult, mult, n);
+    mult = pow_mod(mult, a, n);
     b = b / 2;
-    printf("B: %u Mult: %u\n", b, mult);
   }
   return prod;
 }
