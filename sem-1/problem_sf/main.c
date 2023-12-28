@@ -20,12 +20,12 @@ int fib(int x) {
 
 void print_sf(int x) {
   int i = 1, max_fib = 0, max_i, rest;
-  if (x == 0) printf("0\n");
-  if (x == 1) printf("1\n");
-  if (x == 2) printf("10\n");
-  if (x < 3) return;
+  if (x == 0) {
+    printf("0\n");
+    return;
+  }
 
-  while (max_fib < x) {
+  while (max_fib <= x) {
     ++i;
     max_fib = fib(i);
   }
