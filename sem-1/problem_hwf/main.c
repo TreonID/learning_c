@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
     if (argv[1][0] == '-' && argv[1][1] == 's')
       game_start(1);
     else 
-      printf("Fibonacci game. Use -s argument for silent mode.\n");
+      printf("Fibonacci game. Use -s argument for silent mode. Run without arguments for normal mode.\n");
   } else {
     game_start(0);
   }

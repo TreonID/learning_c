@@ -4,6 +4,7 @@
 #include "logic.h"
 
 #define MAX_TURNS 200
+#define MAX_MATCHES 200
 
 int read_value() {
   int res, x;
@@ -21,7 +22,7 @@ void print_hello_total(int try) {
     printf("Hello, it's fibonacci game!\nHow many matches will there be at the start?\n");
   else
     printf("Please, try again\n");  
-  printf("From 2 to 200:\n");
+  printf("From 2 to %d:\n", MAX_MATCHES);
 }
 
 
@@ -61,7 +62,7 @@ void game_start(int silent_interface) {
   int turns[MAX_TURNS] = {0};
   int turn_id = 0;
 
-  while ( !((total >= 2) && (total <= 200)) ) {
+  while ( !((total >= 2) && (total <= MAX_MATCHES)) ) {
     if (!silent_interface)
       print_hello_total(try);
     try++;

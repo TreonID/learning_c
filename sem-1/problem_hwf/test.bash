@@ -1,9 +1,10 @@
 #!/bin/bash
 
-for testfile in ./test*.in; do
+for testfile in ./test/test*.in; do
   result=$(./game -s < $testfile)
   
   echo $testfile
+  cat $testfile
   cat $testfile.out
   echo $result
   if [ "$result" = "$(cat $testfile.out)" ]; 

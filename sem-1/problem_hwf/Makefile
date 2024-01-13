@@ -16,5 +16,6 @@ clean:
 	rm -f *.o
 	rm -f game
 
+.PHONY: test
 test:
 	@./test.bash
