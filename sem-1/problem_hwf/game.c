@@ -54,14 +54,16 @@ void print_short_result(int total, int *turns, int count) {
   printf("\n");
 }
 
-int main() {
+void start_game(int silent_interface) {
+
   int total = 0, total_on_start = 0, who_turn = 0, try = 0;
   int max_to_get = 0, turn = 0;
   int turns[MAX_TURNS] = {0};
   int turn_id = 0;
 
   while ( !((total >= 2) && (total <= 200)) ) {
-    print_hello_total(try);
+    if (!silent_interface)
+      print_hello_total(try);
     try++;
     total = read_value();
   }
@@ -71,30 +73,35 @@ int main() {
 
   try = 0;
   while((who_turn != 1) && (who_turn != 2)) {
-    print_who_first(try);
+    if (!silent_interface)
+      print_who_first(try);
     try++;
     who_turn = read_value();
   }
   
  
   while(max_to_get < total) {
-    printf("Total matches: %d Max to get: %d\n", total, max_to_get);
+    if (!silent_interface)
+      printf("Total matches: %d Max to get: %d\n", total, max_to_get);
 
     if (who_turn == 1) {
       try = 0;
       turn = 0;
       while ( !((turn >= 1) && (turn <= max_to_get)) ) {
-        print_turn_player(try, max_to_get);
+        if (!silent_interface)
+          print_turn_player(try, max_to_get);
         try++;
         turn = read_value();
       }
-      printf("You get %d matches\n\n", turn);
+      if (!silent_interface)
+        printf("You get %d matches\n\n", turn);
 
     }
     
     if (who_turn == 2) {
         turn = next_turn(total, max_to_get);
-        printf("PC get %d matches\n\n", turn);
+        if (!silent_interface)
+          printf("PC get %d matches\n\n", turn);
     }
     total = total - turn;
     turns[turn_id] = turn;
@@ -103,10 +110,12 @@ int main() {
     who_turn = (who_turn == 1) ? 2 : 1;
   }
   
-  printf("Total matches: %d Max to get: %d\n", total, max_to_get);
-  if(who_turn == 2)
-    printf("You lost, try again, study the algorithms ;)\n");
-  else
-    printf("You won, hooray!\n");
+  if (!silent_interface) {
+    printf("Total matches: %d Max to get: %d\n", total, max_to_get);
+    if(who_turn == 2)
+      printf("You lost, try again, study the algorithms ;)\n");
+    else
+      printf("You won, hooray!\n");
+  }
   print_short_result(total_on_start, turns, turn_id);
 }

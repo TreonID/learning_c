@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "logic.h"
+
+int read_value() {
+  int res, x;
+  res = scanf("%d", &x); 
+  if (res != 1) {
+    fprintf(stderr, "Input error\n");
+    abort();
+  }
+  return x;
+}
+
+void print_who_first(int try) {
+  if (try == 0)
+    printf("Ok, who takes first?\n");
+  else
+    printf("Bad choise, try again, who takes first?\n");
+  printf("1 - You\n");
+  printf("2 - PC\n");
+}
+
+int main() {
+  int total, who_first = 0, wf_try = 0;
+
+  printf("Hello, it's fibonacci game, how many matches will there be at the start?\n");
+  total = read_value();
+
+
+  while((who_first != 1) || (who_first != 2)) {
+    print_who_first(wf_try);
+    wf_try++;
+
+    who_first = read_value();
+  }
+
+  printf("HIT!");
+
+  printf("Total: %d\n", total);
+
+}
