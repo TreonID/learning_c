@@ -11,6 +11,8 @@ logic.o: logic.c
 	$(CC) $(CFLAGS) -c logic.c
 
 game.o: game.c logic.h
+	$(CC) $(CFLAGS) -c game.c
+	
 
 clean:
 	rm -f *.o
