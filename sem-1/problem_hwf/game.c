@@ -54,7 +54,7 @@ void print_short_result(int total, int *turns, int count) {
   printf("\n");
 }
 
-void start_game(int silent_interface) {
+void game_start(int silent_interface) {
 
   int total = 0, total_on_start = 0, who_turn = 0, try = 0;
   int max_to_get = 0, turn = 0;
