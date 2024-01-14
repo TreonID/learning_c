@@ -8,9 +8,15 @@ int main() {
   res = scanf("%d", &n);
   if (res != 1 || n <= 0) {
     fprintf(stderr, "Input error, n > 0\n");
+    abort();
   }
 
   sieve = calloc(n + 1, sizeof(char));
+  if (sieve == NULL) {
+    fprintf(stderr, "Memory allocation error\n");
+    abort();
+  }
+
   for (int i = 2; i * i <= n; ++i) {
     for (int j = 2; i * j <= n; ++j) {
       sieve[i * j] = 1;
