@@ -51,4 +51,5 @@ int main() {
     list_append(list, 1);
     n = list_len(list);
     permute(list, 0, n - 1);
+    list_free(list);
 }
