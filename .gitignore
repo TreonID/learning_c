@@ -2,3 +2,4 @@
 **/*.o
 **/game
 **/main
+.vscode
