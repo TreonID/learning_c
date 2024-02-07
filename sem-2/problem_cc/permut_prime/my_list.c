@@ -100,3 +100,19 @@ void list_swap(struct node_t *list, unsigned index_a, unsigned index_b) {
     list_at_index(list, index_a)->data = list_at_index(list, index_b)->data;
     list_at_index(list, index_b)->data = temp;
 }
+
+struct node_t *list_reverse(struct node_t *list) {
+    struct node_t *first = NULL, *second = NULL, *tmp;
+    if (list == NULL) return NULL;
+    if (list->next == NULL) return list;
+    first = list;
+    second = list->next;
+    list->next = NULL;
+    while (second != NULL) {
+        tmp = second->next;
+        second->next = first;
+        first = second;
+        second = tmp;
+    }
+    return first;
+}

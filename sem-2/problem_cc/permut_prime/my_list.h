@@ -16,5 +16,6 @@ struct node_t *list_copy(struct node_t *list);
 void list_print(struct node_t *list);
 struct node_t *list_at_index(struct node_t *list, unsigned index);
 void list_swap(struct node_t *list, unsigned index_a, unsigned index_b);
+struct node_t *list_reverse(struct node_t *list);
 
 #endif
