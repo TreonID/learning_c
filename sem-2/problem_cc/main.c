@@ -14,6 +14,10 @@ void fill_sieve(struct sieve_t *sv) {
 }
 
 int is_prime(struct sieve_t sv, int x) {
+    if (x > sv.n) {
+      printf("Error: out of bounds, %d\n", x);
+      return 0;
+    }
     return (sv.s[x] == 1) ? 0 : 1;
 }
 
@@ -71,13 +75,15 @@ int find_cc(int start, struct sieve_t *sv) {
 int main() {
     struct sieve_t *sv = calloc(1, sizeof(struct sieve_t));
     int res, n;
-    int bound = 20000000;
+    int bound = 1000;
 
     res = scanf("%d", &n);
     if (res != 1) {
         fprintf(stderr, "Input error\n");
         abort();
     }
+
+    bound = mult(num_len(n)+1);
 
     sv->n = bound;
     sv->s = calloc(bound, sizeof(char));
