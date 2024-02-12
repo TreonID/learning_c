@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 struct sieve_t {
     int n;
@@ -23,10 +24,11 @@ unsigned char get_bit(unsigned char *s, int n) {
 }
 
 void fill_sieve(struct sieve_t *sv) {
+    int bound = (sv->n * 8) * 6 + 5;
     set_bit(sv->mod1, 0);
-    for (int i = 2; i * i <= (sv->n * 8) * 6 + 5; ++i) {
-        if (((i % 6 == 1) || (i % 6 == 5)) && is_prime(sv, i))
-            for (int j = 2; i * j <= ((sv->n * 8) * 6 + 5); ++j) {
+    for (int i = 2; i * i <= bound; ++i) {
+        if (is_prime(sv, i))
+            for (int j = 2; i * j <= bound; ++j) {
                 if ((i * j - 1) % 6 == 0)
                     set_bit(sv->mod1, (i * j) / 6);
                 else if ((i * j - 5) % 6 == 0)
@@ -51,7 +53,6 @@ int is_prime(struct sieve_t *sv, unsigned n) {
 }
 
 int n_count_prime(struct sieve_t *sv, int n) {
-    // TODO: Fix function for all test
     int max_size = (sv->n * 8) * 6 + 5;
     int count = 0;
 
@@ -82,10 +83,18 @@ int get_prime_naive(int n) {
         }
 }
 
+long long sieve_bound(int num) {
+    if (num <= 20) return 100;
+    double dnum = num;
+    double dres = dnum * (log(dnum) + log(log(dnum)));
+    return (long long) round(dres);
+}
+
 int main() {
     // For test
     struct sieve_t *sv = calloc(1, sizeof(struct sieve_t));
-    int bound = 30000000;
+    long long bound = ((sieve_bound(70000000) / 8) / 6) + 10 ;
+    printf("%lld\n", bound);
 
     sv->n = bound;
     sv->mod1 = calloc(bound, sizeof(unsigned char));
