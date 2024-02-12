@@ -8,6 +8,8 @@ struct sieve_t {
     unsigned char *mod5;
 };
 
+int is_prime(struct sieve_t *sv, unsigned n);
+
 void set_bit(unsigned char *s, int n) {
     unsigned byte_shift = n / 8;
     unsigned bit_n = n % 8;
@@ -22,15 +24,15 @@ unsigned char get_bit(unsigned char *s, int n) {
 
 void fill_sieve(struct sieve_t *sv) {
     set_bit(sv->mod1, 0);
-    for (int i = 2; i * i <= (sv->n * 8) * 6 + 5; ++i)
-        if ((get_bit(sv->mod1, i * 6 + 1) == 0u) && (get_bit(sv->mod5, i * 6 + 5) == 0u)) {
-            for (int j = 2; i * j <= (sv->n * 8) * 6 + 5; ++j) {
+    for (int i = 2; i * i <= (sv->n * 8) * 6 + 5; ++i) {
+        if (((i % 6 == 1) || (i % 6 == 5)) && is_prime(sv, i))
+            for (int j = 2; i * j <= ((sv->n * 8) * 6 + 5); ++j) {
                 if ((i * j - 1) % 6 == 0)
                     set_bit(sv->mod1, (i * j) / 6);
                 else if ((i * j - 5) % 6 == 0)
                     set_bit(sv->mod5, (i * j) / 6);
             }
-        }
+    }
 }
 
 int is_prime(struct sieve_t *sv, unsigned n) {
@@ -49,19 +51,41 @@ int is_prime(struct sieve_t *sv, unsigned n) {
 }
 
 int n_count_prime(struct sieve_t *sv, int n) {
+    // TODO: Fix function for all test
     int max_size = (sv->n * 8) * 6 + 5;
     int count = 0;
-    for (int i = 1; i < max_size;++i) {
+
+    for (int i = 1; i < max_size; ++i) {
         if (is_prime(sv, i)) ++count;
-        if (count == n) return i; 
+        if (count == n) return i;
     }
+
     return -1;
+}
+
+int is_prime_naive(int x) {
+    if (x < 2) return 1;
+    for (int i = 2; i * i <= x; ++i)
+        if ((x % i) == 0)
+            return 0;
+
+    return 1;
+}
+
+int get_prime_naive(int n) {
+    int j = 0;
+    if (n < 1) return 0;
+    for (int i = 2;; ++i)
+        if (is_prime_naive(i)) {
+            ++j;
+            if (j == n) return i;
+        }
 }
 
 int main() {
     // For test
     struct sieve_t *sv = calloc(1, sizeof(struct sieve_t));
-    int bound = 1000;
+    int bound = 30000000;
 
     sv->n = bound;
     sv->mod1 = calloc(bound, sizeof(unsigned char));
@@ -69,10 +93,20 @@ int main() {
 
     fill_sieve(sv);
 
-    printf("Test 1 10: %d\n", n_count_prime(sv, 10));
-    printf("Test 2 20: %d\n", n_count_prime(sv, 20));
-    printf("Test 3 50: %d\n", n_count_prime(sv, 50));
-    
+    assert(n_count_prime(sv, 10) == 29);
+    assert(n_count_prime(sv, 20) == 71);
+    assert(n_count_prime(sv, 50) == 229);
+    assert(n_count_prime(sv, 100) == 541);
+    assert(n_count_prime(sv, 1000) == 7919);
+    assert(n_count_prime(sv, 10000) == 104729);
+    assert(n_count_prime(sv, 100000) == 1299709);
+    assert(n_count_prime(sv, 1000000) == 15485863);
+    assert(n_count_prime(sv, 10000000) == 179424673);
+    assert(n_count_prime(sv, 20000000) == 373587883);
+    assert(n_count_prime(sv, 25000000) == 472882027);
+    assert(n_count_prime(sv, 50000000) == 982451653);
+    assert(n_count_prime(sv, 60000000) == 1190494759);
+    assert(n_count_prime(sv, 70000000) == 1400305337);
 
     free(sv->mod1);
     free(sv->mod5);
