@@ -112,6 +112,7 @@ void prime_init() {
 
     srand(time(NULL));
 
+
     sv->n = SIEVE_ARR_SIZE_IN_BYTES;
     sv->mod1 = calloc(SIEVE_ARR_SIZE_IN_BYTES, sizeof(unsigned char));
     sv->mod5 = calloc(SIEVE_ARR_SIZE_IN_BYTES, sizeof(unsigned char));
