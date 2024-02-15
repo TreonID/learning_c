@@ -1,5 +1,5 @@
 // 
-// Heap algorithm for enumerating options, processing results
+// Heap's algorithm for enumerating options, processing results
 //
 
 #ifndef PERMUT_H
