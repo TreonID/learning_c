@@ -81,3 +81,13 @@ int *masked_arr(struct form_t form, int *arr, int size) {
             res[m * MASK_LEN + p] = arr[form.masks[m].pos[p]];
     return res;
 }
+
+int *unmasked_arr(struct form_t form, int *arr, int size) {
+    int *res;
+    res = calloc(MASK_LEN * form.edges, sizeof(int));
+    for (int m = 0; m < form.edges; ++m)
+        for (int p = 0; p < MASK_LEN; ++p)
+            // res[m * MASK_LEN + p] = arr[form.masks[m].pos[p]];
+            res[form.masks[m].pos[p]] = arr[m * MASK_LEN + p];
+    return res;
+}

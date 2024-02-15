@@ -64,6 +64,7 @@ void output(int *a, int size) {
                         add_flag = 0;
                     cycle_move(tmp, form.edges * MASK_LEN, MASK_LEN);
                 }
+                free(lst_tmp);
             }
             if (add_flag)
                 list_append(list, a, size);

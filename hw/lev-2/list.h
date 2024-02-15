@@ -20,5 +20,7 @@ struct node_t *list_at_index(struct node_t *list, unsigned index);
 struct node_t *list_reverse(struct node_t *list);
 
 int *arr_copy(int *a, int size);
+int arr_comp_is_a_gt_b(int *a, int *b, int size);
+void arr_copy_from_b_to_a(int *a, int *b, int size);
 
 #endif

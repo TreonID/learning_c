@@ -78,7 +78,6 @@ void list_arr_print(int *a, int size) {
     printf("]");
 }
 
-
 void list_print(struct node_t *list, int data_size) {
     struct node_t *node = list;
     if (list == NULL) {
@@ -90,7 +89,7 @@ void list_print(struct node_t *list, int data_size) {
     while (node->next != NULL) {
         printf(", \n\t");
         node = node->next;
-        
+
         list_arr_print(node->data, data_size);
     }
     printf("\n)\n");
@@ -130,4 +129,17 @@ int *arr_copy(int *a, int size) {
     int *new = calloc(size, sizeof(int));
     for (int i = 0; i < size; ++i) new[i] = a[i];
     return new;
+}
+
+int arr_comp_is_a_gt_b(int *a, int *b, int size) {
+    for (int i = 0; i < size; ++i) {
+        if (b[i] > a[i]) return 0;
+        if (b[i] < a[i]) return 1;
+    }
+    return 0;
+}
+
+void arr_copy_from_b_to_a(int *a, int *b, int size) {
+    for (int i = 0; i < size; ++i)
+        a[i] = b[i];
 }

@@ -16,6 +16,7 @@ void form_print(struct form_t form, int *a, int size);
 void mask_print_value(struct form_t form);
 void assign_mask(struct form_t *form);
 int *masked_arr(struct form_t form, int *arr, int size);
+int *unmasked_arr(struct form_t form, int *arr, int size);
 
 extern const int MASK_LEN;
 
