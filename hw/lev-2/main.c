@@ -29,10 +29,16 @@ int mask_sum(struct mask_t mask, int *a, int size);
 void mask_print(struct mask_t mask, int *a, int size);
 void form_print(struct form_t form, int *a, int size);
 
+int *masked_arr(struct form_t form, int *arr, int size);
+void cycle_move(int *arr, int size, int step);
+int arr_val_equal(int *a1, int *a2, int size);
+int cycle_move_count(int size, int step);
+
 int SWAP_COUNTER = 0;
 int PERMUT_COUNTER = 0;
 
 struct form_t *GLOBAL_FORM;
+struct node_t *GLOBAL_LIST_RESULT;
 
 void swap(int *a, int *b) {
     int tmp = *a;
@@ -62,6 +68,8 @@ void generate(int k, int *a, int size) {
 
 void output(int *a, int size) {
     struct form_t form = *GLOBAL_FORM;
+    struct node_t *list = GLOBAL_LIST_RESULT;
+    int *tmp, *lst_tmp, l_len, add_flag;
 
     int sum = mask_sum(form.masks[0], a, size);
     int sum_equal_flag = 1;
@@ -70,9 +78,27 @@ void output(int *a, int size) {
             sum_equal_flag = 0;
 
     if (sum_equal_flag) {
-        form_print(form, a, size);
-    }
+        tmp = masked_arr(form, a, size);
+        l_len = list_len(list);
 
+        if (l_len == 0) {
+            list = make_node(a, size);
+            GLOBAL_LIST_RESULT = list;
+        } else {
+            add_flag = 1;
+            for (int l = 0; l < l_len; ++l) {
+                lst_tmp = masked_arr(form, list_at_index(list, l)->data, size);
+                for (int cc = 0; cc < cycle_move_count(form.edges * MASK_LEN, MASK_LEN); ++cc) {
+                    if (arr_val_equal(tmp, lst_tmp, size))
+                        add_flag = 0;
+                    cycle_move(tmp, form.edges * MASK_LEN, MASK_LEN);
+                }
+            }
+            if (add_flag)
+                list_append(list, a, size);
+        }
+        free(tmp);
+    }
     PERMUT_COUNTER++;
 }
 
@@ -132,7 +158,7 @@ void assign_mask(struct form_t *form) {
     int last_assign = -1;
     int last_end_elem = -1;
 
-    for (int i = 0; i < form->edges; ++i) {
+    for (int i = 0; i < form->edges; ++i)
         for (int j = 0; j < MASK_LEN; ++j) {
             if (j == 1) {
                 if (last_end_elem == -1) {
@@ -147,30 +173,63 @@ void assign_mask(struct form_t *form) {
                 if (j == MASK_LEN - 1) last_end_elem = last_assign;
             }
         }
-    }
-    form->masks[form->edges-1].pos[MASK_LEN-1] = form->masks[0].pos[1];
+    form->masks[form->edges - 1].pos[MASK_LEN - 1] = form->masks[0].pos[1];
 }
 
-int main() {
-    int arr[] = {1, 2, 3, 4, 5, 6};
-    int arr_size = 6;
-    struct form_t form;
-    struct node_t *list = make_node(arr, arr_size);
-    list_append(list, arr, arr_size);
+int *masked_arr(struct form_t form, int *arr, int size) {
+    int *res;
+    res = calloc(MASK_LEN * form.edges, sizeof(int));
+    for (int m = 0; m < form.edges; ++m)
+        for (int p = 0; p < MASK_LEN; ++p)
+            res[m * MASK_LEN + p] = arr[form.masks[m].pos[p]];
+    return res;
+}
 
-    list_print(list, arr_size);
+void cycle_move(int *arr, int size, int step) {
+    int *tmp = calloc(size, sizeof(int));
+    for (int i = 0; i < size - step; ++i)
+        tmp[i + step] = arr[i];
+    for (int i = size - step; i < size; ++i)
+        tmp[i - (size - step)] = arr[i];
+
+    for (int i = 0; i < size; ++i)
+        arr[i] = tmp[i];
+
+    free(tmp);
+}
+
+int arr_val_equal(int *a1, int *a2, int size) {
+    int res = 1;
+    for (int i = 0; i < size; ++i)
+        if (a1[i] != a2[i]) res = 0;
+    return res;
+}
+
+int cycle_move_count(int size, int step) { return size / step; }
+
+int main() {
+    int *arr;
+    int arr_size;
+    struct form_t form;
+    struct node_t *list;
 
     form.edges = 3;
+    arr_size = form.edges * 2;
+    arr = calloc(arr_size, sizeof(int));
+    for (int i = 0; i < arr_size; ++i)
+        arr[i] = i + 1;
     form.masks = calloc(form.edges, sizeof(struct mask_t));
-
     assign_mask(&form);
-    mask_print_value(form);
-
     GLOBAL_FORM = &form;
 
-    // generate(arr_size, arr, arr_size);
-    // printf("Swap: %d Permut: %d\n", SWAP_COUNTER, PERMUT_COUNTER);
+    generate(arr_size, arr, arr_size);
+
+    list = GLOBAL_LIST_RESULT;
+    for (int i = 0; i < list_len(list); ++i) {
+        form_print(form, list_at_index(list, i)->data, arr_size);
+    }
 
     free(form.masks);
     list_free(list);
+    free(arr);
 }

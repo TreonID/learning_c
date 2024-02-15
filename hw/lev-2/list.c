@@ -85,14 +85,15 @@ void list_print(struct node_t *list, int data_size) {
         printf("List: (NULL)\n");
         return;
     }
-    printf("List: (");
+    printf("List: (\n\t");
     list_arr_print(node->data, data_size);
     while (node->next != NULL) {
-        printf(", ");
+        printf(", \n\t");
         node = node->next;
+        
         list_arr_print(node->data, data_size);
     }
-    printf(")\n");
+    printf("\n)\n");
 }
 
 struct node_t *list_at_index(struct node_t *list, unsigned index) {

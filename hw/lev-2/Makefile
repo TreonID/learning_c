@@ -1,6 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -O2
 
+
 all: main.o list.o
 	$(CC) $(CFLAGS) main.o list.o -o a.out
 
