@@ -1,3 +1,7 @@
+// 
+// Heap algorithm for enumerating options, processing results
+//
+
 #ifndef PERMUT_H
 #define PERMUT_H
 

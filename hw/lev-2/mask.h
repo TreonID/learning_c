@@ -1,3 +1,8 @@
+//
+// Builds a mask for arrays according to a triangle, square, etc. pattern. 
+// Contains functions for calculating the sum, displaying it, converting to linear form and vice versa.
+//
+
 #ifndef MASK_H
 #define MASK_H
 

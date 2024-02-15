@@ -1,3 +1,7 @@
+//
+// Cyclic permutations
+//
+
 #ifndef CYCLE_H
 #define CYCLE_H
 

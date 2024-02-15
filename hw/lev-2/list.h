@@ -1,3 +1,7 @@
+//
+// Implementation of a singly linked list for storing the results of selecting options.
+//
+
 #ifndef LIST_H
 #define LIST_H
 
