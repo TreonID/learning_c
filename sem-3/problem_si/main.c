@@ -24,7 +24,13 @@ void inssort(int *arr, int len) {
 }
 
 int moveright(int *arr, int key, int last) {
-  // TODO: ваш код здесь
+  if (last == 0)
+    return 0;
+  for (int i = last - 1; i >= 0; --i)
+    if (arr[i] > key)
+      arr[i + 1] = arr[i];
+    else
+      return i + 1;
   return last;
 }
 
@@ -60,7 +66,7 @@ void print_data(const struct data_t data) {
 }
 
 int main() {
-  int i;
+  int i, pos;
   struct data_t d;
 
   if (scanf("%u", &d.len) != 1) {
@@ -93,10 +99,11 @@ int main() {
   }
 
   print_data(d);
-  shuffle_fy(&d);
+  pos = moveright(d.arr, 5, 0);
   print_data(d);
-  inssort(d.arr, d.len);
-  print_data(d);
+  printf("pos = %d\n", pos);
+  // inssort(d.arr, d.len);
+  // print_data(d);
 
   free(d.arr);
 }
