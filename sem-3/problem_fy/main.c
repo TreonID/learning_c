@@ -24,12 +24,10 @@ void swap(int *a, int *b) {
 
 void shuffle_fy(struct data_t *data) {
   struct data_t d = *data;
-  unsigned max_pos = d.len - 1, rand_pos;
-  for (int i = max_pos; i > 0; --i) {
-    rand_pos = myrand() % i;
-    printf("SWAP: %d %d\n", i, rand_pos);
+  unsigned rand_pos;
+  for (int i = d.len - 1; i > 0; --i) {
+    rand_pos = myrand() % (i + 1);
     swap(&d.arr[i], &d.arr[rand_pos]);
-    print_data(d);
   }
 }
 
