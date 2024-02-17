@@ -26,15 +26,22 @@ void swap(int *a, int *b) {
   }
 }
 
-void selectsort_iterate(int *arr, unsigned len, unsigned last) {
-  int min = arr[last], pos = last;
-  for (int i = last; i < len; ++i)
+int min_pos(int *arr, unsigned len) {
+  int min = arr[0], pos = 0;
+  for (int i = 0; i < len; ++i) {
     if (arr[i] < min) {
       min = arr[i];
       pos = i;
     }
+  }  
+  return pos;
+}
+
+void selectsort_iterate(int *arr, unsigned len, unsigned last) {
+  int pos = last + min_pos(arr + last, len - last);
   swap(&arr[pos], &arr[last]);
 }
+
 
 int main() {
   int i, last;
