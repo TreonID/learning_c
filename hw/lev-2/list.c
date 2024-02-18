@@ -1,3 +1,23 @@
+//---------------------------------------------
+//
+// Implementation of a singly linked list for storing the results of selecting options.
+//
+// 1. make_node - make one node, first step to create list
+// 2. free_node - free resources of one node
+// 3. list_append - add node to the end of list
+// 4. list_free - free resources of all nodes in list
+// 5. list_len - get length on list
+// 6. list_copy - copy list to new list
+// 7. list_arr_print - print array of int data, for debug
+// 8. list_print - print list data for debug
+// 9. list_at_index - get node of list at index
+// 10. list_reverse - revere order of list nodes
+// 11. arr_copy - copy array to new array and return it
+// 12. arr_comp_is_a_gt_b - comparison function, is "a" great then "b" return 1
+// 13. arr_copy_from_b_to_a - copy b array values to a array
+//
+//---------------------------------------------
+
 #include "list.h"
 
 #ifndef STD_INC

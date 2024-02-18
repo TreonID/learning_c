@@ -1,3 +1,13 @@
+//---------------------------------------------
+//
+// Cyclic permutations
+//
+// 1. cycle_move - cyclic shifts all elements to the right by "step"
+// 2. arr_val_equal - compare two arrays by their values
+// 3. cycle_move_count - count of cyclic permutatuions
+//
+//---------------------------------------------
+
 #include "cycle.h"
 
 #include "list.h"

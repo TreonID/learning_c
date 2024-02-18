@@ -1,3 +1,15 @@
+//---------------------------------------------
+//
+// Heap's algorithm for enumerating options, processing results
+//
+// 1. swap - swap two elements
+// 2. generate - Heap's recursive permutation algorithm, handle result to output function
+// 3. output - check sum of each lines, if they are equal set sum_equal_flag,
+//    make list of result, checks each new candidate to cyclic permutation, if candidate ok, 
+//    then add to result list
+//
+//---------------------------------------------
+
 #include "permut.h"
 
 #include "cycle.h"

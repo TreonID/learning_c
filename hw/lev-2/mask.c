@@ -1,3 +1,20 @@
+//---------------------------------------------
+// 
+// Builds a mask for arrays according to a triangle, square, etc. pattern. 
+// Contains functions for calculating the sum, displaying it, converting to linear form and vice versa.
+// 
+//  1. mask_sum - calc sum of one line, by struct mask_t { unsigned pos[3]; };
+//  2. mask_print - print array values of one line, by struct mask_t { unsigned pos[3]; };
+//  3. form_print - print array values of all lines, struct form_t { int edges; struct mask_t *masks; };
+//  4. mask_print_value - pint mask values, used for debug
+//  5. assign_mask - build struct form_t. Example: {1, 2, 3} {4, 3, 5} {6, 5, 2}
+//     last elem of k = second elem of k+1
+//     last elem of last k = second elem of k0
+//  6. 4,3,2; 6,2,1; 5,1,3; -> masked_arr -> {4, 3, 2, 6, 2, 1, 5, 1, 3}
+//  7. {4, 3, 2, 6, 2, 1, 5, 1, 3} -> unmasked_arr ->  4,3,2; 6,2,1; 5,1,3;
+//
+//---------------------------------------------
+
 #include "mask.h"
 
 #ifndef STD_INC

@@ -1,3 +1,27 @@
+//---------------------------------------------
+// 
+// Combinatorial search. Magic lines.
+// 
+// Read number of lines from stdin.
+// 1. assign_mask -> builds masks to obtain lines from the array, 
+//    save result to global variable GLOBAL_FORM.
+//    Details in mask.c
+//
+// 2. generate -> generate permutations of array, function use prevois taken masks to generate lines,
+//    filter results by cyclic permutations,
+//    get result from global variable GLOBAL_LIST_RESULT, used singly linked list.
+//    Details in permut.c    
+// 
+// 3. cyclic permutatuins sort -> sort each list element by cyclic permutations
+//    1. 4,3,2; 6,2,1; 5,1,3; -> masked_arr -> {4, 3, 2, 6, 2, 1, 5, 1, 3}  in mask.c
+//    2. cyclic_move - make cyclic permutation, in cycle.c
+//    3. arr_comp_is_a_gt_b - comparison function, in list.c
+//    4. arr_copy_from_b_to_a - copy second paramets in first, in list.c
+//    5. {4, 3, 2, 6, 2, 1, 5, 1, 3} -> unmasked_arr ->  4,3,2; 6,2,1; 5,1,3;   in mask.c
+//    6. form_print - print lines in needed form, in mask.c
+//
+//---------------------------------------------
+
 #ifndef STD_INC
 #define STD_INC
 
@@ -59,6 +83,13 @@ void run_form_calc(int edges) {
 }
 
 int main() {
-    // 3 - magic triangle; 4 - magic square; ...
-    run_form_calc(3);
+    int res, edges;
+    printf("Enter number of lines:\n");
+    res = scanf("%d", &edges);
+    if (res != 1) {
+        fprintf(stderr, "Input error\n");
+        abort();
+    }
+
+    run_form_calc(edges);
 }
