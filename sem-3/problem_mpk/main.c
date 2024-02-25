@@ -40,9 +40,6 @@ void p_mult_kar(int *a, int *b, int *c, int n) {
     bsum = calloc(k, sizeof(int));
     mult_sum = calloc(n, sizeof(int));
 
-    for (i = 0; i < n; ++i)
-      mult_sum[i] = 0;
-
     for (i = 0; i < k; ++i) {
       asum[i] = a[i] + a[k + i];
       bsum[i] = b[i] + b[k + i];
