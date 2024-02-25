@@ -6,7 +6,6 @@
 #include <stdlib.h>
 
 void print_arr(int const *arr, unsigned len);
-void pmult_kar(int *p1, int *p2, int *res, int len);
 
 void print_arr(int const *arr, unsigned len) {
   for (int i = 0; i < len; ++i) {
@@ -16,17 +15,15 @@ void print_arr(int const *arr, unsigned len) {
   printf("\n");
 }
 
-void pmult_kar(int *p1, int *p2, int *res, int n) {
-  if (n  == 1) {
-    res[0] = p1[0] * p2[0];
+void p_mult(int *a, int *b, int *c, int n) {
+  if (n == 1) {
+    c[0] += a[0] * b[0];
   } else {
-    // int k = n / 2;
-    // (a1 + a2) -> aa; (b1 + b2) -> bb; (a1 + a2)*(b1 + b2) -> t
-    // int aa[k], bb[k], t[n];
-    // for (int i = 0; i < k; ++i) {
-      
-    // }
-
+    int k = n / 2;
+    p_mult(a, b, c, k);
+    p_mult(a + k, b + k, c + n, k);
+    p_mult(a + k, b, c + k, k);
+    p_mult(a, b + k, c + k, k);
   }
 }
 
@@ -38,7 +35,6 @@ int main() {
     fprintf(stderr, "Input error\n");
     abort();
   }
-
 
   p1 = (int *)calloc(p1_len, sizeof(int));
   p2 = (int *)calloc(p2_len, sizeof(int));
@@ -62,8 +58,7 @@ int main() {
   print_arr(p1, p1_len);
   print_arr(p2, p2_len);
 
-  pmult_kar(p1, p2, res, res_len);
-
+  p_mult(p1, p2, res, p1_len);
   print_arr(res, res_len);
 
   free(p1);
