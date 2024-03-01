@@ -160,6 +160,8 @@ void xmsort(void *mem, int *sizes, int nelts, xcmp_t cmp) {
   xmsort_imp(mem, sizes, nelts, cmp, 0, nelts - 1);
 }
 
+// End solution
+
 int main() {
   int len = 0;
   int *sizes;
