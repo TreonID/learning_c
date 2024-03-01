@@ -39,15 +39,12 @@ int cmp_charint(void *lhs, int lsz, void *rhs, int rsz) {
   return lv - rv;
 }
 
-
-
 typedef int (*xcmp_t)(void *lhs, int lsz, void *rhs, int rsz);
 int ac_pos(int *sizes, int index);
 void copy(void *a, void *b, int count);
 void xmsort_imp(void *mem, int *sizes, xcmp_t cmp, int l, int r);
 void xmsort(void *mem, int *sizes, int nelts, xcmp_t cmp);
 void xmerge(void *mem, int *sizes, xcmp_t cmp, int l, int m, int r);
-
 
 int ac_pos(int *sizes, int index) {
   int pos = 0;
@@ -153,6 +150,56 @@ void xmsort(void *mem, int *sizes, int nelts, xcmp_t cmp) {
   xmsort_imp(mem, sizes, cmp, 0, nelts - 1);
 }
 
+int min_abs_pos(void *mem, int *sizes, xcmp_t cmp, int l, int r) {
+  int len_sizes = 1 + r - l;
+  char *cmem = (char *)mem;
+
+  char *p = &cmem[ac_pos(sizes, l)];
+  int pos = l;
+
+  assert(l <= r);
+  if (l == r) return l;
+
+  assert(l < r);
+  for (int i = l + 1; i <= r; ++i) {
+    if (cmp(p, sizes[pos], &cmem[ac_pos(sizes, i)], sizes[i]) > 0) {
+      pos = i;
+      p = &cmem[ac_pos(sizes, i)];
+    }
+  }
+
+  return pos;
+}
+
+void xselsort(void *mem, int *sizes, int nelts, xcmp_t cmp, int l, int r) {
+  int len_bytes = 0;
+  int len_sizes = 1 + r - l;
+  char *tmp, tmp_pos = 0;
+  int *tmp_sizes, s_pos = 0;
+
+  char *cmem = (char *)mem;
+
+  for (int i = l; i <= r; ++i)
+    len_bytes += sizes[i];
+  tmp = calloc(len_bytes, sizeof(char));
+  tmp_sizes = calloc(len_sizes, sizeof(int));
+
+  for (int i = 0; i <= (r - l) ; ++i) {
+    int min_pos = min_abs_pos(mem, sizes, cmp, l + i, r);
+    copy(&tmp[tmp_pos], &cmem[ac_pos(sizes, min_pos)], sizes[min_pos]);
+    tmp_pos += sizes[min_pos];
+    tmp_sizes[s_pos] = sizes[min_pos];
+    s_pos += 1;
+  }
+
+  printf("TMP ARR: ");
+  xprint_arr(tmp, tmp_sizes, len_sizes);
+  printf("L: %d R: %d\n", l, r);
+
+  free(tmp);
+  free(tmp_sizes);
+}
+
 int main() {
   int len = 4, pos = 0;
   int input[4] = {1004, 3, 5, 2002};
@@ -176,7 +223,8 @@ int main() {
   }
 
   xprint_arr(arr, sizes, len);
-  xmsort(arr, sizes, len, cmp_charint);
+  // xmsort(arr, sizes, len, cmp_charint);
+  xselsort(arr, sizes, len, cmp_charint, 0, 1);
   xprint_arr(arr, sizes, len);
 
   free(arr);
