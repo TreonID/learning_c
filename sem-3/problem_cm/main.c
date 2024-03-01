@@ -150,8 +150,7 @@ void xmsort(void *mem, int *sizes, int nelts, xcmp_t cmp) {
   xmsort_imp(mem, sizes, cmp, 0, nelts - 1);
 }
 
-int min_abs_pos(void *mem, int *sizes, xcmp_t cmp, int l, int r) {
-  int len_sizes = 1 + r - l;
+int min_abs_pos(void *mem, int *sizes, xcmp_t cmp, int l, int r, int *map) {
   char *cmem = (char *)mem;
 
   char *p = &cmem[ac_pos(sizes, l)];
@@ -162,9 +161,12 @@ int min_abs_pos(void *mem, int *sizes, xcmp_t cmp, int l, int r) {
 
   assert(l < r);
   for (int i = l + 1; i <= r; ++i) {
+    if (map[i] == 0)
+      continue;
     if (cmp(p, sizes[pos], &cmem[ac_pos(sizes, i)], sizes[i]) > 0) {
       pos = i;
       p = &cmem[ac_pos(sizes, i)];
+      map[i] = 0;
     }
   }
 
@@ -179,14 +181,18 @@ void xselsort(void *mem, int *sizes, int nelts, xcmp_t cmp, int l, int r) {
 
   char *cmem = (char *)mem;
 
+  int *map = calloc(nelts, sizeof(char));
+  for (int i = 0; i < nelts; ++i)
+    map[i] = 1;
+
   for (int i = l; i <= r; ++i)
     len_bytes += sizes[i];
   tmp = calloc(len_bytes, sizeof(char));
   tmp_sizes = calloc(len_sizes, sizeof(int));
 
   for (int i = 0; i <= (r - l) ; ++i) {
-    int min_pos = min_abs_pos(mem, sizes, cmp, l + i, r);
-    copy(&tmp[tmp_pos], &cmem[ac_pos(sizes, min_pos)], sizes[min_pos]);
+    int min_pos = min_abs_pos(mem, sizes, cmp, l + i, r, map);
+    copy(tmp + tmp_pos, &cmem[ac_pos(sizes, min_pos)], sizes[min_pos]);
     tmp_pos += sizes[min_pos];
     tmp_sizes[s_pos] = sizes[min_pos];
     s_pos += 1;
@@ -198,6 +204,7 @@ void xselsort(void *mem, int *sizes, int nelts, xcmp_t cmp, int l, int r) {
 
   free(tmp);
   free(tmp_sizes);
+  free(map);
 }
 
 int main() {
