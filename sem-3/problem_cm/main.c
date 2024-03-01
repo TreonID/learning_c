@@ -1,5 +1,5 @@
 //
-// Problem MS — слияние для сортировки слиянием
+// Problem CM — обобщённое слияние
 //
 
 #include <assert.h>
@@ -11,6 +11,9 @@
 void print_arr(int const *arr, unsigned len);
 void xprint_arr(char const *arr, int const *sizes, int nelts);
 int cmp_charint(void *lhs, int lsz, void *rhs, int rsz);
+
+
+double diff(struct timespec start, struct timespec end);
 
 void print_arr(int const *arr, unsigned len) {
   for (int i = 0; i < len; ++i) {
@@ -64,29 +67,19 @@ double diff(struct timespec start, struct timespec end) {
   return msec / SEC_AS_MICROSEC;
 }
 
+// Start solution
+
 typedef int (*xcmp_t)(void *lhs, int lsz, void *rhs, int rsz);
 int ac_pos(int *sizes, int index);
-void copy(void *a, void *b, int count);
 void xmsort_imp(void *mem, int *sizes, int nelts, xcmp_t cmp, int l, int r);
 void xmsort(void *mem, int *sizes, int nelts, xcmp_t cmp);
 void xmerge(void *mem, int *sizes, xcmp_t cmp, int l, int m, int r);
-
-int min_abs_pos(void *mem, int *sizes, xcmp_t cmp, int l, int r, char *map);
-void xselsort(void *mem, int *sizes, int nelts, xcmp_t cmp, int l, int r);
 
 int ac_pos(int *sizes, int index) {
   int pos = 0;
   for (int i = 0; i < index; ++i)
     pos += sizes[i];
   return pos;
-}
-
-void copy(void *a, void *b, int count) {
-  char *ca = (char *)a;
-  char *cb = (char *)b;
-  for (int i = 0; i < count; i++) {
-    ca[i] = cb[i];
-  }
 }
 
 void xmerge(void *mem, int *sizes, xcmp_t cmp, int l, int m, int r) {
