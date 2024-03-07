@@ -9,6 +9,7 @@ main.o: main.c
 
 debug:
 	$(CC) -g main.c 
+	gdb ./a.out
 
 .PHONY: test
 test: all

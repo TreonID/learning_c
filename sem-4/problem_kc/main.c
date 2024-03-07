@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-const unsigned R = 2, Q = 1000003;
+const unsigned R = 1, Q = 1000003;
 
 unsigned long long pow_mod(unsigned n, unsigned k, unsigned m);
 
@@ -46,40 +46,44 @@ unsigned long long pow_mod(unsigned n, unsigned k, unsigned m) {
 // или -1 если ничего не найдено
 int rabin_karp(const char *needle, const char *haystack) {
   unsigned n, target, cur, left = 0, right = strlen(needle);
-  
+  int finded = 0;
+  if (strlen(haystack) < strlen(needle))
+    return -1;
 
   target = get_hash(needle, needle + right);
   cur = get_hash(haystack, haystack + right);
-  
+
   n = pow_mod(R, right - 1, Q);
 
-  while (haystack[right] != 0) {
-    int finded = 0;
+  while (finded == 0 && haystack[right] != 0) {
     cur = update_hash(cur, n, haystack[left], haystack[right]);
-    left += 1;
-    right += 1;
+
     if (target == cur) {
       finded = 1;
-      for(unsigned i = 0; i < strlen(needle); ++i)
-        if (haystack[left + i] != needle[i]) {
+      for (unsigned i = 0; i < strlen(needle); ++i)
+        if (haystack[left + 1 + i] != needle[i]) {
           finded = 0;
           break;
         }
-
-      if (finded)
-        break;
     }
+
+    if (finded)
+      return (int)left;
+
+    left += 1;
+    right += 1;
 
   }
 
-  return (target == cur) ? (int)left : -1;
+  return -1;
 }
 
 // End solution
 
 int main() {
   int h_n, n_n;
-  char c;
+  int left = 0;
+  int count = 0, rk = 0;
   char *needle, *haystack;
 
   if (scanf("%d", &h_n) != 1) {
@@ -98,19 +102,18 @@ int main() {
     abort();
   }
 
-  printf("%s\n", haystack);
-  printf("%s\n", needle);
-
-  printf("Needle hash:%d\n", get_hash(needle, needle + n_n));
-  for (int i = 0; i < 10; ++i) {
-    printf("Haystack hash size of %d + %d: %d\n", n_n, i, get_hash(haystack + i, haystack + strlen(needle) + i));
+  while (left < h_n) {
+    rk = rabin_karp(needle, haystack + left);
+    if (rk != -1) {
+      count += 1;
+      left += rk + 1;
+    } else {
+      
+      left += 1;
+    }
   }
-
-  printf("%d\n", rabin_karp(needle, haystack));
-
-  for (c = 'a'; c < 'f'; ++c) {
-    printf("%c = %d\n", c, (int)c);
-  }
+    
+  printf("%d\n", count);
 
   free(needle);
   free(haystack);
