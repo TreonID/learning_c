@@ -6,12 +6,10 @@ char *strcat_r(char *dest, const char *src, int *bufsz) {
   int new_len = *bufsz + strlen(src);
   char *tc = (char *)realloc(dest, new_len);
   if (tc != NULL) {
-    if (tc != dest)
-      free(dest);
     tc = strcat(tc, src);
     *bufsz = new_len;
     return tc;
-  } else { 
+  } else {
     fprintf(stderr, "Memory allocation error\n");
     abort();
   }
