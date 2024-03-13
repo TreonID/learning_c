@@ -65,27 +65,36 @@ void reverse(char *start, int len) {
 
 void make_reverse(char *haystack, int h_len, char const *needle, int n_len) {
   int res;
-  char *pos = haystack;
+  char word[100], n_word[100];
+  char *cpos = haystack;
+  int w_len = 0;
 
   regex_t regex;
   regmatch_t matches[MAX_MATCHES];
-  res = regcomp(&regex, needle, 0);
+  res = regcomp(&regex, needle, REG_EXTENDED);
   if (res) {
     fprintf(stderr, "Regex comp failed\n");
     abort();
   }
 
-  res = regexec(&regex, pos, MAX_MATCHES, matches, REG_EXTENDED);
-  while (!res) {
-    for (size_t i = 0; i <= regex.re_nsub; ++i) {
+  res = regexec(&regex, haystack, MAX_MATCHES, matches, 0);
+  if (!res) {
+    w_len = matches[0].rm_eo - matches[0].rm_so;
+    memcpy(word, haystack + matches[0].rm_so, w_len);
+    word[w_len] = '\0';
+    strcpy(n_word, word);
+    reverse(n_word, w_len);
 #if 0
-      printf("find match so=%d eo=%d\n", matches[i].rm_so, matches[i].rm_eo);
+    printf("Word>%s<\n", word);
+    printf("Reverse Word>%s<\n", n_word);
 #endif
-      reverse(pos + matches[i].rm_so, matches[i].rm_eo - matches[i].rm_so);
-    }
-    pos += matches[0].rm_eo;
-    res = regexec(&regex, pos, MAX_MATCHES, matches, 0);
   }
+
+  if (w_len != 0)
+    while ((cpos = strstr(cpos, word)) != NULL) {
+      memcpy(cpos, n_word, w_len);
+      cpos += w_len;
+    }
 
   regfree(&regex);
 }
