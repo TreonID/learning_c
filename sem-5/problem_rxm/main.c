@@ -37,6 +37,9 @@ int read_string(char **str, int len) {
   }
 
   while (scanf("%c", &c) == 1 && count < len) {
+    if (c == '\n')
+      break;
+
     if (count + 1 > size) {
       size *= 2;
       tmp = s_realloc(tmp, size);
