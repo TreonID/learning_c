@@ -31,7 +31,7 @@ int calc_change(int n, int m, int *changes, int *V) {
   for (i = 0; i < m; ++i) {
     int CT = calc_change(n - changes[i], m, changes, V);
     if (CT == INT_MAX) continue;
-    V[n] = min(V[n], CT + 1);
+    V[n] = max(V[n], CT + 1);
   }
   return V[n];
 }
