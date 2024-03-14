@@ -24,56 +24,27 @@ int min(int a, int b) {
 }
 
 int max(int a, int b) {
-  return (a > b) ? a : b;
+  return (a > b) ? b : a;
 }
-
-
-int calc_change(int n, int m, int *changes, int *V) {
-  int i;
-  if (n == 0) return 0;
-  if (n < 0) return INT_MAX;
-  if (V[n] != INT_MAX) return V[n];
-  for (i = 0; i < m; ++i) {
-    int CT = calc_change(n - changes[i], m, changes, V);
-    if (CT == INT_MAX) continue;
-    V[n] = min(V[n], (CT + 1));
-  }
-  printf("Assign V[%d]=%d\n", n, V[n]);
-  return V[n];
-}
-
-int calc_max(int n, int m, int *changes, int *V) {
-  int i;
-  if (n == 0) return 0;
-  if (n < 0) return INT_MAX;
-  if (V[n] != INT_MAX) return V[n];
-  for (i = 0; i < m; ++i) {
-    int CT = calc_change(n - changes[i], m, changes, V);
-    if (CT == INT_MAX) continue;
-    V[n] = min(V[n], (CT + 1));
-  }
-  printf("Assign V[%d]=%d\n", n, V[n]);
-  return V[n];
-}
-
 
 int main() {
-  int m, n, res;
-  int *stuffs, *V;
+  int m, n;
+  int *changes, *V;
+  int res;
 
   n = read_int();
   m = read_int();
 
-  stuffs = calloc(m, sizeof(int));
+  changes = calloc(m, sizeof(int));
   for (int i = 0; i < m; ++i)
-    stuffs[i] = read_int();
+    changes[i] = read_int();
 
   V = calloc(n + 1, sizeof(int));
   fill_value(V, INT_MAX, n + 1);
 
-  res = calc_max(n, m, stuffs, V);
+  res = calc_change(n, m, changes, V);
   printf("%d\n", res);
 
   free(V);
-  free(stuffs);
+  free(changes);
 }
