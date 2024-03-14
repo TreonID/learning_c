@@ -1,4 +1,4 @@
-/* Problem MC — размен монет */
+/* Problem BP — упаковка рюкзака */
 
 #include <limits.h>
 #include <memory.h>
@@ -23,6 +23,11 @@ int min(int a, int b) {
   return (a > b) ? b : a;
 }
 
+int max(int a, int b) {
+  return (a > b) ? a : b;
+}
+
+
 int calc_change(int n, int m, int *changes, int *V) {
   int i;
   if (n == 0) return 0;
@@ -31,13 +36,13 @@ int calc_change(int n, int m, int *changes, int *V) {
   for (i = 0; i < m; ++i) {
     int CT = calc_change(n - changes[i], m, changes, V);
     if (CT == INT_MAX) continue;
-    V[n] = min(V[n], CT + 1);
+    V[n] = max(V[n], CT + 1);
   }
   return V[n];
 }
 
 int main() {
-  int m, n;
+  int m, n, res;
   int *changes, *V;
 
   n = read_int();
@@ -50,7 +55,8 @@ int main() {
   V = calloc(n + 1, sizeof(int));
   fill_value(V, INT_MAX, n + 1);
 
-  printf("%d\n", calc_change(n, m, changes, V));
+  res = calc_change(n, m, changes, V);
+  printf("%d\n", res);
 
   free(V);
   free(changes);
