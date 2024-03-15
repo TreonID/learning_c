@@ -1,5 +1,6 @@
 /* Problem BP — упаковка рюкзака */
 
+#include <assert.h>
 #include <limits.h>
 #include <memory.h>
 #include <stdio.h>
@@ -24,7 +25,11 @@ int min(int a, int b) {
 }
 
 int max(int a, int b) {
-  return (a > b) ? b : a;
+  return (a > b) ? a : b;
+}
+
+int max3(int a, int b, int c) {
+  return max(max(a, b), c);
 }
 
 void print_table(int **V, int *stuffs, int s_count, int w) {
@@ -45,22 +50,26 @@ void print_table(int **V, int *stuffs, int s_count, int w) {
 }
 
 void build_table(int **V, int *stuffs, int s_count, int w) {
-  for (int i = 0; i < s_count + 1; ++i) {
-    for (int j = 0; j < w + 1; ++j) {
-      if (!i || !j) {
-        V[i][j] = 0;
-        continue;
-      }
+  for (int i = 1; i <= s_count; ++i)
+    for (int c = 1; c <= w; ++c) {
+      V[i][c] = V[i - 1][c];
 
-      if (j - stuffs[i] >= 0)
-        V[i][j] = 1;
+      if ((c / stuffs[i]) > 0)
+        V[i][c] = max(V[i][c], V[i - 1][c - stuffs[i]] + 1);
     }
-  }
+
+}
+
+int int_comp(const void *a, const void *b) {
+  const int *pa = a;
+  const int *pb = b;
+  return *pa - *pb;
 }
 
 int main() {
   int w, s_count;
   int *stuffs, **V;
+  int res;
 
   w = read_int();
   s_count = read_int();
@@ -74,8 +83,17 @@ int main() {
     V[i] = calloc(w + 1, sizeof(int));
   }
 
-  build_table(V, stuffs, s_count, w);
+  qsort(stuffs, s_count + 1, sizeof(int), int_comp);
 
+  build_table(V, stuffs, s_count, w);
+  res = V[s_count][w];
+#if 0
   print_table(V, stuffs, s_count, w);
-  // TODO: Free mem
+#endif
+  printf("%d\n", res);
+
+  for (int i = 0; i < s_count + 1; i++)
+    free(V[i]);
+  free(V);
+  free(stuffs);
 }
