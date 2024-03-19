@@ -75,25 +75,23 @@ void patpreproc(char const *needle, int *needle_lps) {
 char *strstrci(char const *needle, int const *needle_lps, char const *haystack) {
   int h_len = strlen(haystack);
   int n_len = strlen(needle);
-  int k = 0;
+  int p = 0;
 
-  for (int i = 1; i < h_len; ++i) {
-    while (k > 0 && (tolower(haystack[i]) != tolower(needle[k + 1])))
-      k = needle_lps[k - 1];
-    
-    if (tolower(haystack[i]) == tolower(needle[k]))
-      k += 1;
-    
-    if (k == n_len)
-      return (char *)(haystack + (i - n_len + 1));
+  for (int i = 0; i < h_len; ++i) {
+    while (p != 0 && tolower(haystack[i]) != tolower(needle[p]))
+      p = needle_lps[p - 1];
 
+    if (tolower(haystack[i]) == tolower(needle[p]))
+      p += 1;
+
+    if (p == n_len)
+      return (char *)(haystack + i + 1 - n_len);
   }
 
   return NULL;
 }
 
-
-char *strstrci_ed1(char const *needle, int const *needle_lps, char const *haystack) {
+char *strstrci_first_version(char const *needle, int const *needle_lps, char const *haystack) {
   int h_len = strlen(haystack);
   int n_len = strlen(needle);
   int i = 0;
@@ -131,7 +129,6 @@ int main() {
 
   prf = calloc(n_len, sizeof(int));
   patpreproc(needle, prf);
-
   res = strstrci(needle, prf, haystack);
   if (res != NULL)
     printf("%s\n", res);
