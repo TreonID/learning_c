@@ -3,6 +3,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+enum reg_t {
+  A = 0, B, C, D, RLAST
+};
+
+enum opcode_t {
+  MOVI = 0, ADD = 8, SUB = 9, MUL = 10, DIV = 11, IN, OUT, OPLAST
+};
+
+union operand_t {
+  struct { int rd, rs; } ops;
+  int rop;
+  int imm;
+};
+
+struct instr_t {
+  enum opcode_t opcode;
+  union operand_t opnd;
+};
+
+const char *regnames[] = {"A", "B", "C", "D"};
+const char *arithnames[] = {"ADD", "SUB", "MUL", "DIV"};
+
 unsigned read_hex() {
   unsigned tmp;
   if (scanf("%x", &tmp) != 1) {
@@ -12,66 +34,74 @@ unsigned read_hex() {
   return tmp;
 }
 
-char rname(unsigned i) {
-  switch (i) {
-    case 0u:
-      return 'A';
-    case 1u:
-      return 'B';
-    case 2u:
-      return 'C';
-    case 3u:
-      return 'D';
-  }
-  return '!';
-}
+struct instr_t decode_command(unsigned char cmd) {
+  struct instr_t instr;
+  int rf1, rf2;
 
-char *b_opcode(unsigned i) {
-  switch (i) {
-    case 0u:
-      return "ADD";
-    case 1u:
-      return "SUB";
-    case 2u:
-      return "MUL";
-    case 3u:
-      return "DIV";
-  }
-  return "ERROR";
-}
-
-int print_mnemo(unsigned m) {
-  if (!(m & (1u << 7))) {
-    printf("MOVI %d\n", m);
-    return 1;
+  if ((cmd >> 7) == 0) {
+    instr.opcode = MOVI;
+    instr.opnd.imm = cmd;
+    return instr;
   }
 
-  if (!(m & (1u << 6))) {
-    int code = (m & (3u << 4)) >> 4;
-    int r1 = (m & (3u << 2)) >> 2;
-    int r2 = m & 3u;
-    printf("%s %c, %c\n", b_opcode(code), rname(r1), rname(r2));
-    return 1;
-  }
-
-  if ((m & (1u << 6)) && !(m & 7u << 3)) {
-    if (m & (1u << 2)) {
-      printf("OUT %c\n", rname(m & 3u));
-      return 1;
-    } else {
-      printf("IN %c\n", rname(m & 3u));
-      return 1;
+  if (((cmd >> 6) & 1) == 1) {
+    instr.opnd.rop = cmd & 0x3;
+    if ((cmd >> 2) == 0x30)
+      instr.opcode = IN;
+    else if ((cmd >> 2) == 0x31)
+      instr.opcode = OUT;
+    else {
+      fprintf(stderr, "Unrecognized in/out %x\n", (unsigned) cmd);
+      abort();
     }
+    instr.opnd.rop = cmd & 0x3;
+    return instr;
   }
 
-  return -1;
+  rf1 = cmd & 0x3;
+  rf2 = (cmd >> 2) & 0x3;
+  instr.opnd.ops.rs = rf1;
+  instr.opnd.ops.rd = rf2;
+  switch (cmd >> 4) {
+    case 8: instr.opcode = ADD; return instr;
+    case 9: instr.opcode = SUB; return instr;
+    case 10: instr.opcode = MUL; return instr;
+    case 11: instr.opcode = DIV; return instr;
+  }
+  
+  fprintf(stderr, "Unrecognized inst %x\n", (unsigned) cmd);
+  abort();
+}
+
+void print_instr(struct instr_t instr) {
+  switch (instr.opcode) {
+    case MOVI:
+      printf("MOVI %d\n", instr.opnd.imm);
+      break;
+    case IN:
+      printf("IN %s\n", regnames[instr.opnd.rop]);
+      break;
+    case OUT:
+      printf("OUT %s\n", regnames[instr.opnd.rop]);
+      break;
+    case ADD:
+    case SUB:
+    case MUL:
+    case DIV:
+      printf("%s %s, %s\n", arithnames[instr.opcode - 8], regnames[instr.opnd.ops.rd], regnames[instr.opnd.ops.rs]);
+      break;
+    default:
+      fprintf(stderr, "Unsupported opcode\n");
+      abort();
+  }
 }
 
 int main() {
-  unsigned m;
-  while (scanf("%x", &m) == 1)
-    if (print_mnemo(m) != 1) {
-      printf("ERROR\n");
-      break;
-    }
+  unsigned command;
+  while (scanf("%x", &command) == 1) {
+    struct instr_t instr;
+    unsigned char cmd = command & 0xFF;
+    instr = decode_command(cmd);
+    print_instr(instr);
+  }
 }
