@@ -1,4 +1,4 @@
-/* Problem AS2 — декодер */
+/* Problem AS — кодировщик */
 
 #include <regex.h>
 #include <stdio.h>
