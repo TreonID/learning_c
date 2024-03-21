@@ -3,5 +3,11 @@ OUT A
 OUT B
 OUT C
 OUT D
+IN A
 IN B
-ADD B, D
+IN C
+IN D
+    ADD       B     ,       D   
+SUB A, C
+MUL A, A
+DIV B, A

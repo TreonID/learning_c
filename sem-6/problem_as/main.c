@@ -134,6 +134,7 @@ struct instr_t decode_command(unsigned char cmd) {
   abort();
 }
 
+// A -> 0, B -> 1, ...
 int str_to_rop(char *str) {
   for (char *c = str; *c != '\0'; c++)
     switch (*c) {
@@ -150,11 +151,18 @@ int str_to_rop(char *str) {
 }
 
 const char *reg_patterns[] = {
-    "^[[:blank:]]*MOVI[[:blank:]]+[[:digit:]]+[[:blank:]]*$",  // MOVI_OPCODE
-    "[[:digit:]]+",                                            // MOVi_IMM
-    "^[[:blank:]]*OUT[[:blank:]]+[ABCD][[:blank:]]*$",         // OUT_OPCODE
-    "[[:blank:]]+[ABCD][[:blank:]]*$",                         // IN_OUT_ROP
-    "^[[:blank:]]*IN[[:blank:]]+[ABCD][[:blank:]]*$",          // IN_OPCODE
+    "^[[:blank:]]*MOVI[[:blank:]]+[[:digit:]]+[[:blank:]]*$",                          // MOVI_OPCODE
+    "[[:digit:]]+",                                                                    // MOVi_IMM
+    "^[[:blank:]]*OUT[[:blank:]]+[ABCD][[:blank:]]*$",                                 // OUT_OPCODE
+    "[[:blank:]]+[ABCD][[:blank:]]*$",                                                 // IN_OUT_ROP
+    "^[[:blank:]]*IN[[:blank:]]+[ABCD][[:blank:]]*$",                                  // IN_OPCODE
+    "[[:blank:]]+[ABCD][[:blank:]]*,",                                                 // ARITH_OPS_RD
+    ",[[:blank:]]*[ABCD][[:blank:]]*$",                                                // ARITH_OPS_RS
+    "^[[:blank:]]*ADD[[:blank:]]+[ABCD][[:blank:]]*,[[:blank:]]*[ABCD][[:blank:]]*$",  // ADD_OPCODE
+    "^[[:blank:]]*SUB[[:blank:]]+[ABCD][[:blank:]]*,[[:blank:]]*[ABCD][[:blank:]]*$",  // SUB_OPCODE
+    "^[[:blank:]]*MUL[[:blank:]]+[ABCD][[:blank:]]*,[[:blank:]]*[ABCD][[:blank:]]*$",  // MUL_OPCODE
+    "^[[:blank:]]*DIV[[:blank:]]+[ABCD][[:blank:]]*,[[:blank:]]*[ABCD][[:blank:]]*$",  // DIV_OPCODE
+
 };
 
 enum reg_patterns_t {
@@ -163,55 +171,72 @@ enum reg_patterns_t {
   OUT_OPCODE,
   IN_OUT_ROP,
   IN_OPCODE,
+  ARITH_OPS_RD,
+  ARITH_OPS_RS,
+  ADD_OPCODE,
+  SUB_OPCODE,
+  MUL_OPCODE,
+  DIV_OPCODE,
   LAST_PATTERN
 };
 
+regex_t *reg_patterns_comp;
+
+void init_regex(regex_t rarr[LAST_PATTERN]) {
+  for (int i = MOVI_OPCODE; i < LAST_PATTERN; i++)
+    regcomp(&rarr[i], reg_patterns[i], REG_EXTENDED);
+  reg_patterns_comp = rarr;
+}
+
+void free_regex(regex_t rarr[LAST_PATTERN]) {
+  for (int i = MOVI_OPCODE; i < LAST_PATTERN; i++)
+    regfree(&rarr[i]);
+}
+
+char *match_to_word(char *cmd, regoff_t rm_eo, regoff_t rm_so) {
+  int w_len = rm_eo - rm_so;
+  char *word = calloc(w_len + 1, sizeof(char));
+  if (word == NULL) {
+    fprintf(stderr, "Error word allocation in cmd: >%s<", cmd);
+    abort();
+  }
+  memcpy(word, cmd + rm_so, w_len);
+  word[w_len] = '\0';
+  return word;
+}
 
 struct instr_t get_movi(char *cmd) {
   int res;
   struct instr_t instr;
-  regex_t regex;
   regmatch_t matches[1];
 
-  regcomp(&regex, reg_patterns[MOVI_OPCODE], REG_EXTENDED);
-  res = regexec(&regex, cmd, 0, NULL, 0);
-  regfree(&regex);
+  res = regexec(&reg_patterns_comp[MOVI_OPCODE], cmd, 0, NULL, 0);
   if (!res) {
     instr.opcode = MOVI;
-    regcomp(&regex, reg_patterns[MOVI_IMM], REG_EXTENDED);
-    res = regexec(&regex, cmd, 1, matches, 0);
+    res = regexec(&reg_patterns_comp[MOVI_IMM], cmd, 1, matches, 0);
     if (!res) {
-      char word[10];
-      int w_len = matches[0].rm_eo - matches[0].rm_so;
-      int value;
-      memcpy(word, cmd + matches[0].rm_so, w_len);
-      word[w_len] = '\0';
-      value = atoi(word);
+      char *word = match_to_word(cmd, matches[0].rm_eo, matches[0].rm_so);
+      int value = atoi(word);
       if (value < 128)
         instr.opnd.imm = value;
       else {
         fprintf(stderr, "MOVI value out of range (0 <= ... < 128): %d \tcmd: >%s<\n", value, cmd);
         abort();
       }
+      free(word);
     } else {
       fprintf(stderr, "Unrecognized MOVI value >%s<\n", cmd);
       abort();
     }
-    regfree(&regex);
     return instr;
   }
-
-
-
   instr.opcode = OPLAST;
   return instr;
 }
 
-
 struct instr_t get_inout(char *cmd, enum opcode_t opcode) {
   int res;
   struct instr_t instr;
-  regex_t regex;
   regmatch_t matches[1];
 
   enum reg_patterns_t p1, p2;
@@ -229,27 +254,21 @@ struct instr_t get_inout(char *cmd, enum opcode_t opcode) {
       abort();
   }
 
-  regcomp(&regex, reg_patterns[p1], REG_EXTENDED);
-  res = regexec(&regex, cmd, 0, NULL, 0);
-  regfree(&regex);
+  res = regexec(&reg_patterns_comp[p1], cmd, 0, NULL, 0);
   if (!res) {
     instr.opcode = opcode;
 
-    regcomp(&regex, reg_patterns[p2], REG_EXTENDED);
-    res = regexec(&regex, cmd, 1, matches, 0);
+    res = regexec(&reg_patterns_comp[p2], cmd, 1, matches, 0);
     if (!res) {
-      char word[10];
-      int w_len = matches[0].rm_eo - matches[0].rm_so;
-      int value;
-      memcpy(word, cmd + matches[0].rm_so, w_len);
-      word[w_len] = '\0';
-      value = str_to_rop(word);
+      char *word = match_to_word(cmd, matches[0].rm_eo, matches[0].rm_so);
+      int value = str_to_rop(word);
       if (value != -1) {
         instr.opnd.rop = value;
       } else {
         fprintf(stderr, "Value out of range. cmd: >%s<\n", cmd);
         abort();
       }
+      free(word);
     }
     return instr;
   }
@@ -257,30 +276,92 @@ struct instr_t get_inout(char *cmd, enum opcode_t opcode) {
   return instr;
 }
 
+struct instr_t get_arith(char *cmd, enum opcode_t opcode) {
+  int res;
+  struct instr_t instr;
+  regmatch_t matches[1];
+
+  enum reg_patterns_t p1;
+  switch (opcode) {
+    case ADD:
+      p1 = ADD_OPCODE;
+      break;
+    case SUB:
+      p1 = SUB_OPCODE;
+      break;
+    case MUL:
+      p1 = MUL_OPCODE;
+      break;
+    case DIV:
+      p1 = DIV_OPCODE;
+      break;
+
+    default:
+      fprintf(stderr, "Wrong get_inout call\n");
+      abort();
+  }
+
+  res = regexec(&reg_patterns_comp[p1], cmd, 0, NULL, 0);
+  if (!res) {
+    instr.opcode = opcode;
+
+    res = regexec(&reg_patterns_comp[ARITH_OPS_RD], cmd, 1, matches, 0);
+    if (!res) {
+      char *word = match_to_word(cmd, matches[0].rm_eo, matches[0].rm_so);
+
+      int value = str_to_rop(word);
+      if (value != -1) {
+        instr.opnd.ops.rd = value;
+      } else {
+        fprintf(stderr, "Value RD out of range. cmd: >%s<\n", cmd);
+        abort();
+      }
+      free(word);
+    }
+
+    res = regexec(&reg_patterns_comp[ARITH_OPS_RS], cmd, 1, matches, 0);
+    if (!res) {
+      char *word = match_to_word(cmd, matches[0].rm_eo, matches[0].rm_so);
+      int value = str_to_rop(word);
+      if (value != -1) {
+        instr.opnd.ops.rs = value;
+      } else {
+        fprintf(stderr, "Value RS out of range. cmd: >%s<\n", cmd);
+        abort();
+      }
+      free(word);
+    }
+
+    return instr;
+  }
+  instr.opcode = OPLAST;
+  return instr;
+}
 
 struct instr_t encode_command(char *cmd) {
   struct instr_t instr;
 
-  // MOVI
   instr = get_movi(cmd);
   if (instr.opcode != OPLAST)
     return instr;
 
-  // OUT
-  instr = get_inout(cmd, OUT);
-  if (instr.opcode != OPLAST)
-    return instr;
+  for (int i = IN; i <= OUT; i++) {
+    instr = get_inout(cmd, i);
+    if (instr.opcode != OPLAST)
+      return instr;
+  }
 
-  // IN
-  instr = get_inout(cmd, IN);
-  if (instr.opcode != OPLAST)
-    return instr;
-
+  for (int i = ADD; i <= DIV; i++) {
+    instr = get_arith(cmd, i);
+    if (instr.opcode != OPLAST)
+      return instr;
+  }
+  printf("\n");
   fprintf(stderr, "Unrecognized instr >%s<\n", cmd);
   abort();
 }
 
-void print_instr(struct instr_t instr) {
+void print_instr(const struct instr_t instr) {
   switch (instr.opcode) {
     case MOVI:
       printf("MOVI %d\n", instr.opnd.imm);
@@ -303,13 +384,43 @@ void print_instr(struct instr_t instr) {
   }
 }
 
+void print_instr_code(const struct instr_t instr) {
+  switch (instr.opcode) {
+    case MOVI:
+      printf("0x%x", instr.opnd.imm);
+      break;
+    case IN:
+      printf("0x%x", (0x30 << 2) + instr.opnd.rop);
+      break;
+    case OUT:
+      printf("0x%x", (0x31 << 2) + instr.opnd.rop);
+      break;
+    case ADD:
+    case SUB:
+    case MUL:
+    case DIV:
+      printf("0x%x", (instr.opcode << 4) + (instr.opnd.ops.rd << 2) + instr.opnd.ops.rs);
+      break;
+    default:
+      fprintf(stderr, "Unsupported opcode\n");
+      abort();
+  }
+}
+
 int main() {
   char *cmd;
   struct instr_t instr;
+  regex_t regex[LAST_PATTERN];
+
+  init_regex(regex);
+
   while (read_string(&cmd) > 0) {
     instr = encode_command(cmd);
-    print_instr(instr);
+    print_instr_code(instr);
+    printf(" ");
     free(cmd);
   }
+  printf("\n");
   free(cmd);
+  free_regex(regex);
 }
