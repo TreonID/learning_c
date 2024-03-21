@@ -1,7 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-
 // START SOLUTION
 
 int foo(int x, int y) {
@@ -21,6 +17,3 @@ int foo(int x, int y) {
 }
 
 // END SOLUTION
-int main() {
-    foo(1, 1);
-}
