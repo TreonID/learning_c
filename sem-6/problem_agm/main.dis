@@ -1,0 +1,25 @@
+
+main.o:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <foo>:
+   0:	f3 0f 1e fa          	endbr64 
+   4:	89 d0                	mov    eax,edx
+   6:	85 d2                	test   edx,edx
+   8:	74 1f                	je     29 <foo+0x29>
+   a:	7e 1d                	jle    29 <foo+0x29>
+   c:	83 e8 01             	sub    eax,0x1
+   f:	48 98                	cdqe   
+  11:	8b 04 87             	mov    eax,DWORD PTR [rdi+rax*4]
+  14:	39 f0                	cmp    eax,esi
+  16:	7e 12                	jle    2a <foo+0x2a>
+  18:	48 63 d0             	movsxd rdx,eax
+  1b:	89 44 97 04          	mov    DWORD PTR [rdi+rdx*4+0x4],eax
+  1f:	83 e8 01             	sub    eax,0x1
+  22:	75 eb                	jne    f <foo+0xf>
+  24:	b8 01 00 00 00       	mov    eax,0x1
+  29:	c3                   	ret    
+  2a:	83 c0 01             	add    eax,0x1
+  2d:	c3                   	ret    
