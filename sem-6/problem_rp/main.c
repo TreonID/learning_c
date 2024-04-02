@@ -34,7 +34,7 @@ float as_float(unsigned u) {
 
 int main() {
   int num, den;
-  float f1, f2;
+  float f1, f2, f3;
   unsigned e1, e2, fr1, fr2;
   if (scanf("%d", &num) != 1) {
     fprintf(stderr, "Input error: numerator\n");
@@ -45,8 +45,8 @@ int main() {
     abort();
   }
 
-  fesetround(FE_TOWARDZERO);
-  f2 = roundf((float)num) / (float)den;
+  fesetround(FE_UPWARD);
+  f2 = (float)num / (float)den;
   fesetround(FE_DOWNWARD);
   f1 = (float)num / (float)den;
 
@@ -54,7 +54,13 @@ int main() {
   e2 = get_exp(f2);
   fr1 = get_frac(f1);
   fr2 = get_frac(f2);
-  
+
+  if (f2 < 0) {
+    f3 = f1;
+    f1 = f2;
+    f2 = f3;
+  }
+
   if ((e1 == e2) && (fr1 == fr2)) {
     printf("0x%x 0x%x\n", get_exp(f2), get_frac(f2));
   } else {

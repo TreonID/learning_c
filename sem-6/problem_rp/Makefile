@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -O2 -Werror=sign-compare -Werror=vla -Werror=maybe-uninitialized
+CFLAGS=-Wall -Werror=sign-compare -Werror=vla -Werror=maybe-uninitialized
 
 all: main.o
 	$(CC) $(CFLAGS) main.o -o a.out -lm
